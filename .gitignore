@@ -1,3 +1,8 @@
+# Original C++ (and dev-c++ project) files
+*.hpp
+*.cpp
+*.dev
+
 # Prerequisites
 *.d
 
