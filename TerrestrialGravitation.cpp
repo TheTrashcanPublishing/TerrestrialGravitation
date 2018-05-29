@@ -1,6 +1,32 @@
+// TerrestrialGravitation.cpp of TerrestrialGravitation Library Project
+
+// Designed and Coded by Ray Arias for The Trashcan Software and
+// Media Publication as part of TerrestricalGravitation,
+// a software library intended for inclusion with the supplemental
+// paper 2D Terrestrial (Nonturbulent) Gravitational Motion.
 
 
-#include "TerrestrialGravitation.h"
+/*  This file is Copyright © 2018 Raymond Arias, Jr. for
+    The Trashcan Software and Media Publication and is released
+    under the conditions of the GNU General Public License.
+    This file is part of TerrestrialGravitation by Ray Arias.
+
+    TerrestrialGravitation is free software: you can redistribute it
+    and/or modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation, either version 3 of
+    the License, or (at your option) any later version.
+
+    TerrestrialGravitation is distributed in the hope that it will
+    be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TerrestrialGravitation.  If not, see
+	<http://www.gnu.org/licenses/>. */
+
+
+#include "TerrestrialGravitation.hpp"
 
 #define _DEFAULT_TIME 30
 #define GSI 9.80665  // Standard gravity on Earth in SI units = 9.80665 m/sec/sec

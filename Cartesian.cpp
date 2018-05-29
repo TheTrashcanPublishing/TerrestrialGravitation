@@ -1,4 +1,35 @@
-#include "Cartesian.h"
+// Cartesian.cpp for TerrestrialGravitation Library Project
+
+// Designed and Coded by Ray Arias for The Trashcan Software and
+// Media Publication as part of TerrestricalGravitation,
+// a software library intended for inclusion with the supplemental
+// paper 2D Terrestrial (Nonturbulent) Gravitational Motion.
+
+
+/*  This file is Copyright © 2018 Raymond Arias, Jr. for
+    The Trashcan Software and Media Publication and is released
+	under the conditions of the GNU General Public License.
+    This file is part of TerrestrialGravitation by Ray Arias.
+
+    TerrestrialGravitation is free software: you can redistribute it
+    and/or modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation, either version 3 of
+    the License, or (at your option) any later version.
+
+    TerrestrialGravitation is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with TerrestrialGravitation.  If not, see
+	<http://www.gnu.org/licenses/>. */
+
+
+#include "Cartesian.hpp"
+
+#define PI  3.14159265358979323846264338327950288L // value of pi to 36 places
+#define DEGPI 180.0                                // Degrees in angle of pi radians
 
 Cartesian::Cartesian() {
 	atOrigin(); }
@@ -12,16 +43,22 @@ Cartesian::Cartesian(int a, int b) {
 Cartesian::Cartesian(const Cartesian &cartecopy) {
 	xx = cartecopy.xx;
 	yy = cartecopy.yy;
-	x = (int) xx;
-	y = (int) yy; }
+	x = (int) round(xx);
+	y = (int) round(yy); }
 
 Cartesian Cartesian::operator=(const Cartesian &carteassignment) {
 	if (cartesianassignment != this) {
 		xx = cartesianassignment.xx;
 		yy = cartesianassignment.yy;
-		x = (int) xx;
-		y = (int) yy;
+		x = (int) round(xx);
+		y = (int) round(yy);
 	}
+	return *this; }
+
+Cartesian Cartesian::operator-(const Cartesian &carteNegative) {
+	xx = -carteNegative.xx;
+	yy = -carteNegative.yy;
+	concordanceDouble();
 	return *this; }
 
 Cartesian Cartesian::operator+(const Cartesian &carte1, const Cartesian &carte2) {
@@ -36,8 +73,26 @@ Cartesian Cartesian::operator-(const Cartesian &carte1, const Cartesian &carte2)
 	concordanceDouble();
 	return *this; }
 
-Cartesian::~Cartesian() {
-}
+// Complex product
+Cartesian Cartesian::operator*(const Cartesian &carte1, const Cartesian &carte2) {
+	xx = (carte1.xx * carte2.xx) - (carte1.yy * carte2.yy);
+	yy = (carte1.xx * carte2.yy) + (carte1.yy * carte2.xx);
+	concordanceDouble();
+	return *this; }
+
+// Complex quotient
+Cartesian Cartesian::operator/(const Cartesian &carte1, const Cartesian &carte2) {
+	double a, b, c, d, qr, qi;
+	 a = b = c = d = qr = qi = 0.0;
+	 a = carte1.xx;        b = carte1.yy;
+	 c = carte2.xx;        d = carte2.yy;
+	qr = ((a * c) + (b * d)) / ((c * c) + (d * d));
+	qi = ((b * c) - (a * d)) / ((c * c) + (d * d));
+	xx = qr;              yy = qi;
+	concordanceDouble();
+	return *this; }
+
+Cartesian::~Cartesian() { }
 
 int Cartesian::X(void) { return x; }
 
@@ -57,6 +112,12 @@ void Cartesian::Y(int b) {
 	concordanceInt();
 	return; }
 
+void Cartesian::XY(int a, int b) {
+	x = a;
+	y = b;
+	concordanceInt();
+	return; }
+
 void Cartesian::XX(double aa) {
 	xx = aa;
 	concordanceDouble();
@@ -67,14 +128,42 @@ void Cartesian::YY(double bb) {
 	concordanceDouble();
 	return; }
 
+void Cartesian::XXYY(double aa, double bb) {
+	xx = aa;
+	yy = bb;
+	concordanceDouble();
+	return; }
+
 void Cartesian::Position(Cartesian pos) {
 	xx = pos.xx;
 	yy = pos.yy;
 	concordanceDouble();
 	return; }
 
+void Cartesian::invertX(void) {
+	xx = -xx;
+	concordanceDouble();
+	return; }
+
+void Cartesian::invertY(void) {
+	yy = -yy;
+	concordanceDouble();
+	return; }
+
+void Cartesian::invertXY(void) {
+	xx = -xx;
+	yy = -yy;
+	concordanceDouble();
+	return; }
+
+int Cartesian::invert(int a) { return -a; }
+
+double Cartesian::invert(double aa) { return -aa; }
+
 double Cartesian::distanceDouble(void) {
 	double dd = sqrt((xx * xx) + (yy * yy));
+	if ((xx < 0) && (yy > 0)) dd = -dd;
+	else if ((xx >0) && (yy < 0)) dd = -dd;
 	return dd; }
 
 int Cartesian::distanceInt(void) {
@@ -83,16 +172,35 @@ int Cartesian::distanceInt(void) {
 	return d; }
 
 double Cartesian::distance(void) {
-	double dd = distanceDouble(void);
+	double dd = sqrt((xx * xx) + (yy * yy));
+	if ((xx < 0) && (yy > 0)) dd = -dd;
+	else if ((xx < 0) && (yy < 0)) dd = -dd;
 	return dd; }
 
 double Castesian::distance(double aa, double bb) {
 	double ee = aa - xx;
 	double ff = bb - yy;
 	double dd = sqrt((ee * ee) + (ff * ff));
+	if ((ee < 0) && (ff > 0)) dd = -dd;
+	else if ((ee > 0) && (ff < 0)) dd = -dd; 
+	return dd; }
+
+double Castesian::distanceDouble(double aa, double bb) {
+	double ee = aa - xx;
+	double ff = bb - yy;
+	double dd = sqrt((ee * ee) + (ff * ff));
+	if ((ee < 0) && (ff > 0)) dd = -dd;
+	else if ((ee > 0) && (ff < 0)) dd = -dd; 	
 	return dd; }
 
 int Cartesian::distance(int a, int b) {
+	double aa = (double) a;
+	double bb = (double) b;
+	double dd = distance(aa, bb);
+	int d = (int) dd;
+	return d; }
+
+int Cartesian::distanceInt(int a, int b) {
 	double aa = (double) a;
 	double bb = (double) b;
 	double dd = distance(aa, bb);
@@ -103,6 +211,8 @@ double Cartesian::distanceDouble(Cartesian carte) {
 	double ee = catre.xx - xx;
 	double ff = carte.yy - yy;
 	double dd = sqrt((ee * ee) + (ff * ff));
+	if ((ee < 0) && (ff > 0)) dd = -dd;
+	else if ((ee > 0) && (ff < 0)) dd = -dd;
 	return dd; }
 
 int Cartesian::distanceInt(Cartesian carte) {
@@ -110,63 +220,188 @@ int Cartesian::distanceInt(Cartesian carte) {
 	int d = (int) d;
 	return d; }
 
-double Cartesian::distance(Catesian carte) {
-	double dd = distanceDouble(carte);
+double Cartesian::distance(Cartesian carte) {
+	double ee = catre.xx - xx;
+	double ff = carte.yy - yy;
+	double dd = sqrt((ee * ee) + (ff * ff));
+	if ((ee < 0) && (ff > 0)) dd = -dd;
+	else if ((ee > 0) && (ff < 0)) dd = -dd;
 	return dd; }
 
 double Cartesian::angleDouble(void) {
-	double aa = arctan(yy / xx));
+	double aa = 0.0;
+	if (quadrant() > 0) {
+		aa = atan(yy / xx);
+		if (quadrant() == 2) aa = aa + PI;
+		else if (quadrant() == 3) aa = aa + PI;
+		else if (quadrant() == 4) aa = aa + (2.0 * PI); }
+	else if (quadrant() == -2) aa = (0.5 * PI);
+	else if (quadrant() == -3) aa = PI;
+	else if (quadrant() == -4) aa = (1.5 * PI);
 	return aa; }
 
 int Cartesian::angleInt(void) {
-	double aa = angleDouble();
+	double aa = 0.0;
+	if (quadrant() > 0) {
+		aa = atan(yy / xx);
+		if (quadrant() == 2) aa = aa + PI;
+		else if (quadrant() == 3) aa = aa + PI;
+		else if (quadrant() == 4) aa = aa + (2.0 * PI); }
+	else if (quadrant() == -2) aa = (0.5 * PI);
+	else if (quadrant() == -3) aa = PI;
+	else if (quadrant() == -4) aa = (1.5 * PI);
+	aa = (DEGPI / PI) * aa;
 	int a = (int) aa;
 	return a; }
 
 double Cartesian::angle(void) {
-	double aa = angleDouble(void);
+	double aa = 0.0;
+	if (quadrant() > 0) aa = atan(yy / xx);
+	if (quadrant() == 2) aa = aa + PI;
+	if (quadrant() == 3) aa = aa + PI;
+	if (quadrant() == 4) aa = aa + (2.0 * PI);
+	if (quadrant() == -2) aa = (0.5 * PI);
+	if (quadrant() == -3) aa = PI;
+	if (quadrant() == -4) aa = (1.5 * PI);
 	return aa; }
 
 double Castesian::angle(double ww, double zz) {
 	double ee = ww - xx;
 	double ff = zz - yy;
-	double aa = actan(ff / ee);
+	double aa = 0.0;
+	if (quadrant(ee, ff) > 0) aa = atan(ff / ee);
+	else if (quadrant(ee, ff) == 2) aa = aa + PI;
+	else if (quadrant(ee, ff) == 3) aa = aa + PI;
+	else if (quadrant(ee, ff) == 4) aa = aa + (2.0 * PI);
+	else if (quadrant(ee, ff) == -2) aa = (0.5 * PI);
+	else if (quadrant(ee, ff) == -3) aa = PI;
+	else if (quadrant(ee, ff) == -4) aa = (1.5 * PI);
 	return aa; }
+
+double Castesian::angleDouble(double ww, double zz) {
+	double ee = ww - xx;
+	double ff = zz - yy;
+	double aa = 0.0;
+	if (quadrant(ee, ff) > 0) aa = atan(ff / ee);
+	else if (quadrant(ee, ff) == 2) aa = aa + PI;
+	else if (quadrant(ee, ff) == 3) aa = aa + PI;
+	else if (quadrant(ee, ff) == 4) aa = aa + (2.0 * PI);
+	else if (quadrant(ee, ff) == -2) aa = (0.5 * PI);
+	else if (quadrant(ee, ff) == -3) aa = PI;
+	else if (quadrant(ee, ff) == -4) aa = (1.5 * PI);
+	return aa; }	
 
 int Cartesian::angle(int w, int z) {
 	double ww = (double) w;
 	double zz = (double) z;
-	double aa = angle(ww, zz);
+	double ee = ww - xx;
+	double ff = zz - yy;
+	double aa = 0.0;
+	if (quadrant(ee, ff) > 0) aa = atan(ff / ee);
+	else if (quadrant(ee, ff) == 2) aa = aa + PI;
+	else if (quadrant(ee, ff) == 3) aa = aa + PI;
+	else if (quadrant(ee, ff) == 4) aa = aa + (2.0 * PI);
+	else if (quadrant(ee, ff) == -2) aa = (0.5 * PI);
+	else if (quadrant(ee, ff) == -3) aa = PI;
+	else if (quadrant(ee, ff) == -4) aa = (1.5 * PI);
+	aa = (DEGPI / PI) * aa;
+	int a = (int) aa;
+	return a; }
+
+int Cartesian::angleInt(int w, int z) {
+	double ww = (double) w;
+	double zz = (double) z;
+	double ee = ww - xx;
+	double ff = zz - yy;
+	double aa = 0.0;
+	if (quadrant(ee, ff) > 0) aa = atan(ff / ee);
+	else if (quadrant(ee, ff) == 2) aa = aa + PI;
+	else if (quadrant(ee, ff) == 3) aa = aa + PI;
+	else if (quadrant(ee, ff) == 4) aa = aa + (2.0 * PI);
+	else if (quadrant(ee, ff) == -2) aa = (0.5 * PI);
+	else if (quadrant(ee, ff) == -3) aa = PI;
+	else if (quadrant(ee, ff) == -4) aa = (1.5 * PI);
+	aa = (DEGPI / PI) * aa;
 	int a = (int) aa;
 	return a; }
 
 double Cartesian::angleDouble(Cartesian carte) {
 	double ee = catre.xx - xx;
 	double ff = carte.yy - yy;
-	double aa = arctan(ff / ee);
+	double aa = 0.0;
+	if (quadrant(ee, ff) > 0) aa = atan(ff / ee);
+	else if (quadrant(ee, ff) == 2) aa = aa + PI;
+	else if (quadrant(ee, ff) == 3) aa = aa + PI;
+	else if (quadrant(ee, ff) == 4) aa = aa + (2.0 * PI);
+	else if (quadrant(ee, ff) == -2) aa = (0.5 * PI);
+	else if (quadrant(ee, ff) == -3) aa = PI;
+	else if (quadrant(ee, ff) == -4) aa = (1.5 * PI);
 	return aa; }
 
 int Cartesian::angleInt(Cartesian carte) {
-	double aa = angleDouble(carte);
+	double ee = carte.xx - xx;
+	double ff = carte.yy - yy;
+	double aa = 0.0;
+	if (quadrant(ee, ff) > 0) aa = atan(ff / ee);
+	else if (quadrant(ee, ff) == 2) aa = aa + PI;
+	else if (quadrant(ee, ff) == 3) aa = aa + PI;
+	else if (quadrant(ee, ff) == 4) aa = aa + (2.0 * PI);
+	else if (quadrant(ee, ff) == -2) aa = (0.5 * PI);
+	else if (quadrant(ee, ff) == -3) aa = PI;
+	else if (quadrant(ee, ff) == -4) aa = (1.5 * PI);
+	aa = (DEGPI / PI) * aa;
 	int a = (int) aa;
 	return a; }
 
 double Cartesian::angle(Catesian carte) {
-	double aa = angleDouble(carte);
+	double ee = catre.xx - xx;
+	double ff = carte.yy - yy;
+	double aa = 0.0;
+	if (quadrant(ee, ff) > 0) aa = atan(ff / ee);
+	else if (quadrant(ee, ff) == 2) aa = aa + PI;
+	else if (quadrant(ee, ff) == 3) aa = aa + PI;
+	else if (quadrant(ee, ff) == 4) aa = aa + (2.0 * PI);
+	else if (quadrant(ee, ff) == -2) aa = (0.5 * PI);
+	else if (quadrant(ee, ff) == -3) aa = PI;
+	else if (quadrant(ee, ff) == -4) aa = (1.5 * PI);
 	return aa; }
 
+int Cartesian::quadrant(void) {
+	int q = 0;
+	if ((xx > 0.0) && (yy > 0.0)) q = 1;
+	else if ((xx < 0.0) && (yy > 0.0)) q = 2;
+	else if ((xx < 0.0) && (yy < 0.0)) q = 3;
+	else if ((xx > 0.0) && (yy < 0.0)) q = 4;
+	else if ((xx > 0.0) && (yy == 0.0)) q = -1;
+	else if ((xx == 0.0) && (yy > 0.0)) q = -2;
+	else if ((xx < 0.0) && (yy == 0.0)) q = -3;
+	else if ((xx == 0.0) && (yy < 0.0)) q = -4;
+	return q; }
+
+int Cartesian::quadrant(double ww, double zz) {
+	int q = 0;
+	if ((ww > 0.0) && (zz > 0.0)) q = 1;
+	else if ((ww < 0.0) && (zz > 0.0)) q = 2;
+	else if ((ww < 0.0) && (zz < 0.0)) q = 3;
+	else if ((ww > 0.0) && (zz < 0.0)) q = 4;
+	else if ((ww > 0.0) && (zz == 0.0)) q = -1;
+	else if ((ww == 0.0) && (zz > 0.0)) q = -2;
+	else if ((ww < 0.0) && (zz == 0.0)) q = -3;
+	else if ((ww == 0.0) && (zz < 0.0)) q = -4;
+	return q; }
+
 bool Cartesian::concordance(void) {
-	int a = (int) xx;
-	int b = (int) yy;
+	int a = (int) round(xx);
+	int b = (int) round(yy);
 	double aa = (double) x;
 	double bb = (double) y;
 	bool pass = ((a == x) && (b == y));
-	if (pass) pass = ((aa == xx) && (bb == yy));
+	if (pass) pass = ((aa == round(xx)) && (bb == round(yy)));
 	return pass; }
 
 void Cartesian::concordanceDouble(void) {
-	x = (int) xx;
-	y = (int) yy;
+	x = (int) round(xx);
+	y = (int) round(yy);
 	return; }
 
 void Cartesian::concordanceInt(void) {
@@ -175,7 +410,17 @@ void Cartesian::concordanceInt(void) {
 	return; }
 
 Cartesian Cartesian::atOrigin(void) {
-	xx = yy = 0.0F;
+	xx = yy = 0.0;
 	x = y = 0;
 	return *this; }
+
+// Geometric vector dot product
+double Cartesian::DotProduct(const Cartesian &carte) {
+	double mag1, mag2, ang, dot;
+	mag1 = mag2 = ang = dot = 0.0;
+	mag1 = distanceDouble();
+	mag2 = carte.distanceDouble();
+	ang = angleDouble(carte);
+	dot = mag1 * mag2 * cos(ang);
+	return dot; }
 
