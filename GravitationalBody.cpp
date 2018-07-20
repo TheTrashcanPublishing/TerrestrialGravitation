@@ -24,7 +24,7 @@
 #include "GravitationalBody.hpp"
 
 #define GSI 9.80665      // Standard gravity on Earth in SI units = 9.80665 m/sec/sec
-#define GCGS 980.665     // Standard gravity on Earth in CGS units = 980.665 cm/Sec/sec
+#define GCGS 980.665     // Standard gravity on Earth in CGS units = 980.665 cm/sec/sec
 #define GMS2 9 806 650   // Standard gravity on Earth in microns/sec/sec
 #define GUS 32.1740      // Standard gravity on Earth in US units = 32.1740 ft/sec/sec
 #define GIS2 386.088     // Standard gravity on Earth in inches/sec/sec = 386.088 in/s/s
@@ -37,7 +37,7 @@ GravitationalBody::GravitationalBody(void) {
 
 	velocity.x  = velocity.y  = 0;
 	velocity.xx = velocity.yy = 0.0;
-	_at_rest = TRUE;
+	_at_rest = true;
 	
 	initialPosition.x  = initialPosition.y  = 0;
 	initialPosition.xx = initialPosition.yy = 0.0;
@@ -58,7 +58,7 @@ GravitationalBody::GravitationalBody(int a, int b) {
 
 	velocity.x  = velocity.y  = 0;
 	velocity.xx = velocity.yy = 0.0;
-	_at_rest = TRUE;
+	_at_rest = true;
 	
 	initialPosition.x  = initialPosition.y  = 0;
 	initialPosition.xx = initialPosition.yy = 0.0;
@@ -79,7 +79,7 @@ GravitationalBody::GravitationalBody(double aa, double bb) {
 
 	velocity.x  = velocity.y  = 0;
 	velocity.xx = velocity.yy = 0.0;
-	_at_rest = TRUE;
+	_at_rest = true;
 	
 	initialPosition.x  = initialPosition.y  = 0;
 	initialPosition.xx = initialPosition.yy = 0.0;
@@ -100,7 +100,7 @@ GravitationalBody::GravitationalBody(Cartesian pos) {
 
 	velocity.x  = velocity.y  = 0;
 	velocity.xx = velocity.yy = 0.0;
-	_at_rest = TRUE;
+	_at_rest = true;
 	
 	initialPosition.x  = initialPosition.y  = 0;
 	initialPosition.xx = initialPosition.yy = 0.0;
@@ -623,7 +623,7 @@ GravitationalBody::GravitationalBody(const GravitationalBody &gravbodCopy) {
 	_groundOn = gravbodCopy._groundOn;
 	_gravOn = gravbodCopy._gravOn;  }
 
-GravitationalBody::operator=(const GravitationalBody &gravbodAssignment) {
+GravitationalBody GravitationalBody::operator=(const GravitationalBody &gravbodAssignment) {
 	if (this != &gravbodAssignment) {
 		position.xx = gravbodAssignment.position.xx;
 		position.yy = gravbodAssignment.position.yy;
@@ -652,6 +652,49 @@ GravitationalBody::operator=(const GravitationalBody &gravbodAssignment) {
 		_gravOn = gravbodAssignment._gravOn;  }
 
 	return *this; }
+
+bool GravitationalBody::operator==(const GravitationalBody &gravbodEqual1,
+		const GravitationalBody &gravbodEqual2) {
+	bool concordcheck = false;
+	bool equality = false;
+	if (gravbodEqual1.position.concordance())
+		if (gravbodEqual2.position.concordance())
+			if (gravbodEqual1.velocity.concordance())
+				if (gravbodEqual2.velocity.concordance())
+					if (gravbodEqual1.initialPosition.concordance())
+						if (gravbodEqual2.initialPosition.concordance())
+							if (gravbodEqual1.initialVelocity.concordance())
+								if (gravbodEqual2.initialVelocity.concordance())
+									concordcheck = true;
+	if (concordcheck)
+		if (gravbodEqual1.position == gravbodEqual2.position)
+			if (gravbodEqual1.velocity == gravbodEqual2.velocity)
+				if (gravbodEqual1.initialPosition == gravbodEqual2.initialPosition)
+					if (gravbodEqual1.initialVelocity == gravbodEqual2.initialVelocity)
+						equality = true;
+	return equality; }
+
+bool GravitationalBody::operator!=(const GravitationalBody &gravbodUnequal1,
+		const GravitationalBody &gravbodUnequal2) {
+	bool concordcheck = true;
+	bool inequality = false;
+	if !(gravbodUnequal1.position.concordance()) concordcheck = false;
+	else if !(gravbodUnequal2.position.concordance()) concordcheck = false;
+	else if !(gravbodUnequal1.velocity.concordance()) concordcheck = false;
+	else if !(gravbodUnequal2.velocity.concordance()) concordcheck = false;
+	else if !(gravbodUnequal1.initialPosition.concordance()) concordcheck = false;
+	else if !(gravbodUnequal2.initialPosition.concordance()) concordcheck = false;
+	else if !(gravbodUnequal1.initialVelocity.concordance()) concordcheck = false;
+	else if !(gravbodUnequal2.initialVelocity.concordance()) concordcheck = false;
+	if (concordcheck) {
+		if (gravbodUnequal1.position != gravbodUnequal2.position) inequality = true;
+		else if (gravbodUnequal1.velocity != gravbodUnequal2.velocity) inequality = true;
+		else if (gravbodUnequal1.initialPosition != gravbodUnequal2.initialPosition)
+			inequality = true;
+		else if (gravbodUnequal1.initialVelocity != gravbodUnequal2.initialVelocity)
+			inequality = true; }
+	else inequality = true;
+	return inequality; }
 
 GravitationalBody::~GravitationalBody(void) {
 	delete position;
@@ -791,7 +834,7 @@ void GravitationalBody::_G(long int ag) {
 	_concordanceInt();
 	return; }
 
-void GravitationalBody::_GG(double aag) {
+void GravitationalBody::_G(double aag) {
 	_aaccgrav = aag;
 	_concordanceDouble();
 	return; }
@@ -878,7 +921,7 @@ void GravitationalBody::_concordanceInt(void) {
 
 void GravitationalBody::_concordanceDouble(void) {
 	_ground = (int) round(_gground);
-	_accgrav = (int) round(_aacgrav);
+	_accgrav = (long int) round(_aacgrav);
 	_cor100 = (int) round(_ccor * 100.0);
 	return; }
 

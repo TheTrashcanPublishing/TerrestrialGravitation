@@ -35,7 +35,7 @@ InertBody::InertBody(void) {
 	position.atOrigin();
 	velocity.atOrigin();
 	initialPosition.atOrigin();
-	_at_rest = TRUE;
+	_at_rest = true;
 	_n = 0; _t = _DEFAULT_TIME; }
 
 InertBody::InertBody(int a, int b) {
@@ -45,7 +45,7 @@ InertBody::InertBody(int a, int b) {
 	
 	velocity.atOrigin();
 	Position();
-	_at_rest = TRUE;
+	_at_rest = true;
 	_n = 0; _t = _DEFAULT_TIME; }
 
 InertBody::InertBody(double aa, double bb) {
@@ -55,7 +55,7 @@ InertBody::InertBody(double aa, double bb) {
 	
 	velocity.atOrigin();
 	Position();
-	_at_rest = TRUE;
+	_at_rest = true;
 	_n = 0; _t = _DEFAULT_TIME; }
 
 InertBody::InertBody(Cartesian pos) {
@@ -65,7 +65,7 @@ InertBody::InertBody(Cartesian pos) {
 	
 	velocity.atOrigin();
 	Position();
-	_at_rest = TRUE;
+	_at_rest = true;
 	_n = 0; _t = _DEFAULT_TIME; }
 
 InertBody::InertBody(int a, int b, int vx, int vy) {
@@ -293,6 +293,21 @@ InertBody::operator=(const InertBody &bodyAssignment) {
 		_t = bodyAssignment._t; }
 	return *this; }
 
+bool InertBody::operator==(const InertBody &bodyEqual1, const InertBody &bodyEqual2) {
+	bool equality = false;
+	if (bodyEqual1.position == bodyEqual2.position)
+		if (bodyEqual1.velocity == bodyEqual2.velocity)
+			if (bodyEqual1.initialPosition == bodyEqual2.initialPosition)
+				equality = true;
+	return equality; }
+
+bool InertBody::operator!=(const InertBody &bodyUnequal1, const InertBody &bodyUnequal2) {
+	bool inequality = false;
+	if (bodyUnequal1.position != bodyUnequal2.position) inequality = true;
+	else if (bodyUnequal1.velocity != bodyUnequal2.velocity) inequality = true;
+	else if (bodyUnequal1.initialPosition != bodyUnequal2.initialPosition) inequality = true;
+	return inequality; }
+
 InertBody::~InertBody(void) {
 	delete position;
 	delete velocity;
@@ -485,7 +500,7 @@ void InertBody::initPosition(Cartesian ipos) {
 	return; }
 
 
- // assigns current position to initial position
+ // assigns current position as initial position
 void InertBody::initPosition(void) {
 	position.xx = initialPosition.xx;
 	position.yy = initialPosition.yy;
@@ -596,6 +611,10 @@ Cartesian InertBody::prevPosition(void) {
 
 
 // Timeslice size and number of slices
+int InertBody::TimeSlice(void) { return _t; }
+
+int InertBody::NumberOfSlices(void) { return _n }
+
 void InertBody::TimeSlice(int time) {
 	_t = time;
 	return; }
@@ -603,7 +622,3 @@ void InertBody::TimeSlice(int time) {
 void InertBody::NumberOfSlices(int num) {
 	_n = num;
 	return; }
-
-int InertBody::TimeSlice(void) { return _t; }
-
-int InertBody::NumberOfSlices(void) { return _n }

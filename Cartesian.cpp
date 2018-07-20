@@ -92,6 +92,22 @@ Cartesian Cartesian::operator/(const Cartesian &carte1, const Cartesian &carte2)
 	concordanceDouble();
 	return *this; }
 
+bool Cartesian::operator==(const Cartesian &carteEqual1, const Cartesian &carteEqual2) {
+	bool equality = false;
+	if (carteEqual1.concordance())
+		if (carteEqual2.concordance())
+			if (carteEqual1.xx == carteEqual2.xx)
+				if (carteEqual1.yy == carteEqual2.yy) equality = true;
+	return equality; }
+
+bool Cartesian::operator!=(const Cartesian &carteUnequal1, const Cartesian &carteUnequal2) {
+	bool inequality = false;
+	if !(carteUnequal1.concordance()) inequality = true;
+	else if !(carteUnequal2.concordance()) inequality = true;
+	else if (carteUnequal1.xx != carteUnequal2.xx) inequality = true;
+	else if (carteUnequal1.yy != carteUnequal2.yy) inequality = true;
+	return inequality; }
+
 Cartesian::~Cartesian() { }
 
 int Cartesian::X(void) { return x; }
@@ -378,6 +394,18 @@ int Cartesian::quadrant(void) {
 	else if ((xx == 0.0) && (yy < 0.0)) q = -4;
 	return q; }
 
+int Cartesian::quadrant(int w, int z) {
+	int q = 0;
+	if ((w > 0) && (z > 0)) q = 1;
+	else if ((w < 0) && (z > 0)) q = 2;
+	else if ((w < 0) && (z < 0)) q = 3;
+	else if ((w > 0) && (z < 0)) q = 4;
+	else if ((w > 0) && (z == 0)) q = -1;
+	else if ((ww == 0) && (zz > 0)) q = -2;
+	else if ((ww < 0) && (zz == 0)) q = -3;
+	else if ((ww == 0) && (zz < 0)) q = -4;
+	return q; }
+
 int Cartesian::quadrant(double ww, double zz) {
 	int q = 0;
 	if ((ww > 0.0) && (zz > 0.0)) q = 1;
@@ -389,6 +417,72 @@ int Cartesian::quadrant(double ww, double zz) {
 	else if ((ww < 0.0) && (zz == 0.0)) q = -3;
 	else if ((ww == 0.0) && (zz < 0.0)) q = -4;
 	return q; }
+
+int Cartesian::rectangularX(int r, int thetaDeg) {
+	int w = 0;
+	double ww = 0.0;
+	double rr = (double) r;
+	double theta = (((double) thetaDeg) / DEGPI) * PI;
+	w = rr * cos(theta);
+	w = (int) round(xx);
+	return w; }
+
+double Cartesian::rectagularXX(double rr, double thetaRad) {
+	double ww = rr * cos(thetaRad);
+	return ww; }
+
+int Cartesian::rectangularY(int r, int thetaDeg) {
+	int z = 0;
+	double zz = 0.0;
+	double rr = (double) r;
+	double theta = (((double) thetaDeg) / DEGPI) * PI;
+	zz = rr * sin(theta);
+	z = (int) round(zz);
+	return z; }
+
+double Cartesian::rectangularYY(double rr, double thetaRad) {
+	double zz = rr * sin(thetaRad);
+	return zz; }
+
+Cartesian Cartesian::rectangularC(int r, int thetaDeg) {
+	Cartesian point;
+	double ww = 0.0;
+	double zz = 0.0;
+	double rr = (double) r;
+	double theta = (((double) thetaDeg) / DEGPI) * PI;
+	ww = rr * cos(theta);
+	zz = rr * sin(theta);
+	point.xx = ww;
+	point.yy = zz;
+	point.concordanceDouble();
+	return point; }
+
+Cartesian Cartesian::rectangularC(double rr, double thetaRad) {
+	Cartesian point;
+	double ww = rr * cos(thetaRad);
+	double zz = rr * sin(thetaRad);
+	point.xx = ww;
+	point.yy = zz;
+	point.concordanceDouble();
+	return point; }
+
+void Cartesian::rectangular(int r, int thetaDeg) {
+	double ww = 0.0;
+	double zz = 0.0;
+	double rr = (double) r;
+	double theta = (((double) thetaDeg) / DEGPI) * PI;
+	ww = rr * cos(theta);
+	zz = rr * sin(theta);
+	xx = ww;  yy = zz;
+	concordanceDouble();
+	return; }
+
+void Cartesian::rectangular(double rr, double thetaRad) {
+	double ww = rr * cos(thetaRad);
+	double zz = rr * sin(thetaRad);
+	xx = ww;  yy = zz;
+	concordanceDouble();
+	return; }
 
 bool Cartesian::concordance(void) {
 	int a = (int) round(xx);

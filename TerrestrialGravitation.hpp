@@ -36,29 +36,50 @@
 class TerrestrialGravitation
 {
 	public:
-		int numberOfGravBodies;
-		GravitationalBody[] gravBodies[numberofGravBodies];
-		int time, bool at_rest;
-		int groundInt, double groundDouble, int gInt, double gDouble;
+		unsigned int numberOfGravBodies;
+		GravitationalBody[] gravBody[numberofGravBodies];
+		unsigned int groundSlices, sliceWidthInt;
+		unsigned double sliceWidthDouble;
+		signed int [] groundInt[groundSlices];
+		signed double [] groundDouble [groundSlices];
+		unsigned int time, signed int gInt, signed double gDouble;
+		TerrestrialGravitation(void);
+		TerrestrialGravitation(unsigned int numGbodies);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices, unsigned int t);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices, unsigned int t,
+			signed int gI);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices, unsigned int t,
+			signed double gD);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices, unsigned int t,
+			signed int gI, signed int grdInt);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices, unsigned int t,
+			signed double gD, signed double grdDouble);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int t, signed int gI,
+			string fname);
+		TerrestrialGravitation(unsigned int numGbodies, unsigned int t, signed double gD,
+			string fname);
+		TerrestrialGravitation(string fname);
 		TerrestrialGravitation();
-		TerrestrialGravitation(int a, int b);
-		TerrestrialGravitation(int a, int b, int t);
-		TerrestrialGravitation(double aa, double bb);
-		TerrestrialGravitation(double aa, double bb, int t);
-		TerrestrialGravitation(int a, int b, int vx, int vy);
-		TerrestrialGravitation(int a, int b, int vx, int vy, int t);
-		TerrestrialGravitation(double aa, double bb, double vxx, double vyy);
-		TerrestrialGravitation(double aa, double bb, double vxx, double vyy, int t);
-		TerrestrialGravitation(Cartesian pos);
-		TerrestrialGravitation(Cartesian pos, int t);
-		TerrestrialGravitation(Cartesian pos, Cartesian vel);
-		TerrestrialGravitation(Cartesian pos, Cartesian vel, int t);
+		TerrestrialGravitation();
 		TerrestrialGravitation(const TerrestrialGravitation &terrgravCopy);
 		operator=(const TerrestrialGravitation &terrgravAssignment);
 		~TerrestrialGravitation();
 		
-		void T(int t);
+		void T(unsigned int t);
 		int T(void);
+		
+		void initGround(void);
+		void initGround(unsigned int grdInt);
+		void initGround(unsigned double grdDouble);
+		void initGround(string fname);
+		
+		void initBodies(void);
+		void initBodies(Cartesian pos, Cartesian vel, Cartesian ipos, Cartesian ivel);
+		void initBody(unsigned int bodyNum, Cartesian pos, Cartesian vel, Cartesian ipos,
+			Cartesian ivel);
+		
+		void initAllMembers(string fname);
 		
 		// Read current position of TerrestrialGravitation object
 		int X(void);
@@ -115,9 +136,16 @@ class TerrestrialGravitation
 		void PrevPos(void);     // Move object to previous position
 		void NextPos(void);     // Move object to next position
 		void HaltMotion(void);  // Halt motion at current position
+
+protected:
+		bool _sliceConcordance(int slice);
+		void _sliceConcordanceInt(int slice;
+		void _sliceConcordanceDouble(int slice);
+	
+		bool _groundConcordance(void);
+		void _groundConcordanceInt(void);
+		void _groundConcordanceDouble(void);
 		
-	private:
-		bool _at_rest;
 };
 
 #endif

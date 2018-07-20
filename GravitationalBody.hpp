@@ -77,7 +77,11 @@ class GravitationalBody : protected InertBody
 		GravitationalBody(Cartesian pos, Cartesian vel, Cartesian ipos, Cartesian ivel,
 		    double ggrnd, double aagv, double epsilon);
 		GravitationalBody(const GravitationBody &gravbodCopy);
-		operator=(const GravitationalBody &gravbodAssignment);
+		GravitationalBody operator=(const GravitationalBody &gravbodAssignment);
+		bool operator==(const GravitationalBody &gravbodEqual1,
+				const GravitationalBody &gravbodEqual2);
+		bool operator!=(const GravitationalBody &gravbodUnequal1,
+				const GravitationalBody &gravbodUnequal2);
 		~GravitationalBody(void);
 
 		// read current position and current velocity of object
@@ -138,13 +142,13 @@ class GravitationalBody : protected InertBody
 		int _cor100, double _ccor, bool _groundOn, bool _gravOn;    // variable members
 		// int _ground and double _gground are horizontal y/yy-level ground
 		// long int _accgrav and double _aacgrav are acceleration of gravity
-		// int _cor100 is percentage of coefficient of restitution (bouceback from ground)
+		// int _cor100 is percentage of coefficient of restitution (bounceback from ground)
 		// double _ccor is same expressed as pure decimal
 		// _groundOn switches the horizonal ground on (or off)
 		// _gravOn switches the gravity on (or off)
 		
 		void _G(long int ag);      // assign acceleration of gravity in int
-		void _GG(double aag); // assign acceleration of gravity in double
+		void _G(double aag); // assign acceleration of gravity in double
 		void _GMS2(void);     // assign acceleration of gravity to micron/sec/sec
 		void _GGSI(void);     // assign acceleration of gravity to SI units
 		void _GGCGS(void);    // assign acceleration of gravity to CGS units

@@ -26,9 +26,13 @@
 	<http://www.gnu.org/licenses/>. */
 
 
-#include "TerrestrialGravitation.hpp"
-
 #define _DEFAULT_TIME 30
+#define _DEFAULT_GRSLICES 48
+#define _DEFAULT_SLICEWIDTH 10
+#define _DEFAULT_SLICEWIDTH_DOUB 10.0
+#define _DEFAULT_GRDEPTH 100
+#define _DEFAULT_GRDEPTH_DOUB 100.0
+
 #define GSI 9.80665  // Standard gravity on Earth in SI units = 9.80665 m/sec/sec
 #define GCGS 980.665 // Standard gravity on Earth in CGS units = 980.665 cm/Sec/sec
 #define GMS2 9806650 // Standard gravity on Earth in microns/sec/sec
@@ -36,145 +40,112 @@
 #define GIS2 386.088 // Standard gravity on Earth in inches/sec/sec = 386.088 in/s/s
 #define G1000IS2 386088 // Standard gravity on Earth in 1000ths of inches/sec/sec
 
+#include <iostream>
+#include <fstream> 
+#include "TerrestrialGravitation.hpp"
+using namespace std;
 
-TerrestrialGravitation::TerrestrialGravitation() {
-	position.xx = velocity.xx = 0.0F;
-	position.yy = velocity.yy = 0.0F;
-	position.x = velocity.x = 0;
-	position.y = velocity.y = 0;
+
+TerrestrialGravitation::TerrestrialGravitation(void) {
+	numberOfGravBodies = 1;
+	gravBody[0].position.atOrigin();
+	gravBody[0].velocity.atOrigin();
+	gravBody[0].initialPosition.atOrigin();
+	gravBody[0].initialVelocity.atOrigin();
 	time = _DEFAULT_TIME;
-	_at_rest = TRUE; }
+	gInt = (int) GSI;
+	gDouble = GSI;
+	groundSlices = _DEFAULT_GRSLICES;
+	groundInt[0] = _DEFAULT_GRDEPTH;
+	groundDouble[0] = _DEFAULT_GRDEPTH_DOUB; }
 
-TerrestrialGravitation::TerrestrialGravitation(int a, int b) {
-	position.x = a;
-	position.y = b;
-	position.xx = (double) a;
-	position.yy = (double) b;
-	
-	velocity.xx = velocity.yy = 0.0F;
-	velocity.x = velocity.y = 0;
-	
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
 	time = _DEFAULT_TIME;
-	_at_rest = TRUE; }
+	gInt = (int) GSI;
+	gDouble = GSI;
+	groundSlices = _DEFAULT_GRSLICES;
+	initGround(); }
 
-TerrestrialGravitation::TerrestrialGravitation(int a, int b, int t) {
-	position.x = a;
-	position.y = b;
-	position.xx = (double) a;
-	position.yy = (double) b;
-	
-	velocity.xx = velocity.yy = 0.0F;
-	velocity.x = velocity.y = 0;
-	
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
+	time = _DEFAULT_TIME;
+	gInt = (int) GSI;
+	gDouble = GSI;
+	groundSlices = grSlices;;
+	initGround(); }
+
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices,
+			unsigned int t) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
 	time = t;
-	_at_rest = TRUE; }
+	gInt = (int) GSI;
+	gDouble = GSI;
+	groundSlices = grSlices;;
+	initGround(); }
 
-TerrestrialGravitation::TerrestrialGravitation(double aa, double bb,
-		double vxx, double vyy) {
-	position.xx = aa;
-	position.yy = bb;
-	position.x = (int) aa;
-	position.y = (int) bb;
-	
-	velocity.xx = vxx;
-	velocity.yy = vyy;
-	velocity.x = (int) vxx;
-	velocity.y = (int) vyy; 
-	
-	time = _DEFAULT_TIME;
-	_at_rest = ((vxx == vyy) == 0.0F); }
-	
-
-
-TerrestrialGravitation::TerrestrialGravitation(double aa, double bb,
-		double vxx, double vyy, int t) {
-	position.xx = aa;
-	position.yy = bb;
-	position.x = (int) aa;
-	position.y = (int) bb;
-	
-	velocity.xx = vxx;
-	velocity.yy = vyy;
-	velocity.x = (int) vxx;
-	velocity.y = (int) vyy; 
-	
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices,
+			unsigned int t, signed int gI) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
 	time = t;
-	_at_rest = ((vxx == vyy) == 0.0F); }
+	gInt = gI;
+	gDouble = (double) gI;
+	groundSlices = grSlices;;
+	initGround(); }
 	
-TerrestrialGravitation::TerrestrialGravitation(int a, int b, int vx, int vy) {
-	position.x = a;
-	position.y = b;
-	position.xx = (double) a;
-	position.yy = (double) b;
-	
-	velocity.x = vx;
-	velocity.y = vy;
-	velocity.xx = (double) vx;
-	velocity.yy = (double) vy;
-	
-	time = _DEFAULT_TIME;
-	_at_rest = ((vxx == vyy) == 0.0F); }
-
-TerrestrialGravitation::TerrestrialGravitation(int a, int b, int vx, int vy, int t) {
-	position.x = a;
-	position.y = b;
-	position.xx = (double) a;
-	position.yy = (double) b;
-	
-	velocity.x = vx;
-	velocity.y = vy;
-	velocity.xx = (double) vx;
-	velocity.yy = (double) vy;
-	
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices,
+			unsigned int t, signed double gD) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
 	time = t;
-	_at_rest = ((vx == vy) == 0); }
+	gDouble = gD;
+	gInt = (int) round(gD);
+	groundSlices = grSlices;;
+	initGround(); }
 
-TerrestrialGravitation::TerrestrialGravitation(Cartesian pos) {
-	position.xx = pos.xx;
-	position.yy = pos.yy;
-	position.concordanceDouble();
-	
-	velocity.xx = velocity.yy = 0.0F;
-	velocity.x = velocity.y = 0;
-	
-	time = _DEFAULT_TIME;
-	_at_rest = TRUE; }
-
-TerrestrialGravitation::TerrestrialGravitation(Cartesian pos, int t) {
-	position.xx = pos.xx;
-	position.yy = pos.yy;
-	position.concordanceDouble();
-	
-	velocity.xx = velocity.yy = 0.0F;
-	velocity.x = velocity.y = 0;
-	
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices,
+			unsigned int t, signed int gI, signed int grdInt) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
 	time = t;
-	_at_rest = TRUE; }
+	gInt = gI;
+	gDouble = (double) gI;
+	groundSlices = grSlices;;
+	initGround(grdInt); }
 
-
-TerrestrialGravitation::TerrestrialGravitation(Cartesian pos, Cartesian vel) {
-	position.xx = pos.xx;
-	position.yy = pos.yy;
-	position.concordanceDouble();
-	
-	velocity.xx = vel.xx;
-	velocity.yy = vel.yy;
-	velocity.concordanceDouble();
-	
-	time = _DEFAULT_TIME;
-	_at_rest = ((vel.xx == vel.yy) == 0.0F); }
-
-TerrestrialGravitation::TerrestrialGravitation(Cartesian pos, Cartesian vel, int t) {
-	position.xx = pos.xx;
-	position.yy = pos.yy;
-	position.concordanceDouble();
-	
-	velocity.xx = vel.xx;
-	velocity.yy = vel.yy;
-	velocity.concordanceDouble();
-	
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int grSlices,
+			unsigned int t, signed double gD, signed double grdDouble) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
 	time = t;
-	_at_rest = ((vel.xx == vel.yy) == 0.0F); }
+	gDouble = gD;
+	gInt = (int) round(gD);
+	groundSlices = grSlices;;
+	initGround(grdDouble); }
+
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int t,
+			signed int gI, string fname) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
+	time = t;
+	gInt = gI;
+	gDouble = (double) gI;
+	initGround(fname); }
+
+TerrestrialGravitation::TerrestrialGravitation(unsigned int numGbodies, unsigned int t,
+			signed double gD, string fname) {
+	numberOfGravBodies = numGbodies;
+	initBodies();
+	time = t;
+	gDouble = gD;
+	gInt = (int) round(gD);
+	initGround(fname); }
+
+TerrestrialGravitation::TerrestrialGravitation(string fname) { initAllMembers(fname); }
 
 TerrestrialGravitation::TerrestrialGravitation(
 		const TerrestrialGravitation &terrgravCopy) {
@@ -234,6 +205,135 @@ void TerrestrialGravitation::T(int t) {        // Set fineness of time division
 	return; }
 
 int TerrestrialGravitation::T(void) { return time; }
+
+void TerrestrialGravitation::initGround(void) {
+	for (int i = 0; i < groundWidth; i++) {
+		groundInt[i] = _DEFAULT_GRDEPTH;
+		groundDouble[i] = _DEFAULT_GRDEPTH_DOUB; }
+	return; }
+
+void TerrestrialGravitation::initGround(int grdInt) {
+	for (int i = 0; i < groundWidth; i++) {
+		groundInt[i] = grdInt;
+		_sliceConcordanceInt(i); }
+	return; }
+
+void TerrestrialGravitation::initGround(double grdDouble) {
+	for (int i = 0; i < groundWidth; i++) {
+		groundDouble[i] = grdDouble;
+		_sliceConcordanceDouble(i); }
+	return; }
+
+void TerrestrialGravitation::initGround(string fname) {
+	bool IorD = false;
+	string fsline;
+	int fsint = 0;
+	double fsdouble = 0.0;
+	ofstream file;
+	file.open(fname, ios::in);
+	IorD = (bool) getline(file, fsline); 
+	groundSlices = (int) getline(file, fsline);
+	for (int i = 0; ((i < groundSlices) && (getline(file, fsline))); i++) {
+		if (IorD) {
+			fsdouble = (double) fsline;
+			groundDouble[i] = fsdouble;
+			_sliceConcordanceDouble(i); }
+		else {
+			fsint = (int) fsline;
+			groundInt[i] = fsint;
+			_sliceConcordanceInt(i); }
+	}
+	file.close();
+	return; }
+
+void TerrestrialGravitation::initBodies(void) {
+	for (int i = 0; i < NumberOfGravBodies; i++) {
+		gravBody[i].position.atOrigin();
+		gravBody[i].velocity.atOrigin();
+		gravBody[i].initialPosition.atOrigin();
+		gravBody[i].initialVelocity.atOrigin();}
+	return; }
+
+void TerrestrialGravitation::initBodies(Cartesian pos, Cartesian vel,
+		Cartesian ipos, Cartesian ivel) {
+	for (int i = 0; i < NumberOfGravBodies; i++) {
+		gravBody[i].position = pos;
+		gravBody[i].velocity = vel;
+		gravBody[i].initialPosition = ipos;
+		gravBody[i].initialVelocity = ivel; }
+	return; }
+
+void TerrestrialGravitation::initBody(int bodyNum, Cartesian pos, Cartesian vel,
+		Cartesian ipos, Cartesian ivel) {
+	gravBody[bodyNum].position = pos;
+	gravBody[bodyNum].velocity = vel;
+	gravBody[bodyNum].initialPosition = ipos;
+	gravBody[bodyNum].initialVelocity = ivel;
+	return; }
+
+void TerrestrialGravitation::initAllMembers(string fname) {
+	bool IorD = false;
+	string fsline;
+	signed int fssint = 0;
+	unsigned int fsuint = 0U;
+	double fsdouble = 0.0;
+	Cartesian pos, vel, ipos, ivel;
+	pos.atOrigin();
+	vel.atOrigin();
+	ipos.atOrigin();
+	ivel.atOrigin();
+	ofstream file;
+	file.open(fname, ios::in);
+	IorD = (bool) getline(file, fsline);
+	if !(IorD) {
+		fsint = (int) getline(file, fsline);
+		gInt = fssint; }
+	else { // IorD true
+		fsdouble = (double) getline(file, fsline);
+		gDouble = fsdouble; }
+	fsuint = (unsigned int) getline(file, fsline);
+	time = fsuint;
+	fsuint = (unsigned int) getline(file, fsline);
+	groundSlices = fsuint;
+	fsuint = (unsigned int) getline(file, fsline);
+	numberOfGravBodies = fsuint;
+	for (unsigned int i = 0; i < numberOfGravBodies; i++) {
+		fsdouble = (double) getline(file, fsline);
+		pos.xx = fsdouble;
+		fsdouble = (double) getline(file, fsline);
+		pos.yy = fsdouble;
+		pos.concordanceDouble();
+
+		fsdouble = (double) getline(file, fsline);
+		vel.xx = fsdouble;
+		fsdouble = (double) getline(file, fsline);
+		vel.yy = fsdouble;
+		vel.concordanceDouble();
+
+		fsdouble = (double) getline(file, fsline);
+		ipos.xx = fsdouble;
+		fsdouble = (double) getline(file, fsline);
+		ipos.yy = fsdouble;
+		ipos.concordanceDouble();
+
+		fsdouble = (double) getline(file, fsline);
+		ivel.xx = fsdouble;
+		fsdouble = (double) getline(file, fsline);
+		ivel.yy = fsdouble;
+		ivel.concordanceDouble();
+
+		initBody(i, pos, vel, ipos, ivel); }
+	for (int i = 0; ((i < groundSlices) && (getline(file, fsline))); i++) {
+		if (IorD) {
+			fsdouble = (double) fsline;
+			groundDouble[i] = fsdouble;
+			_sliceConcordanceDouble(i); }
+		else {
+			fsint = (int) fsline;
+			groundInt[i] = fsint;
+			_sliceConcordanceInt(i); }
+	}
+}
 
 void TerrestrialGravitation::X(int a) {
 	position.x = a;
@@ -426,4 +526,49 @@ void TerrestrialGravitation::HaltMotion(void) {  // Halt motion at current posit
 	velocity.yy = 0.0F;
 	velocity.concordanceDouble();
 }
+
+bool TerrestrialGravitation::_sliceConcordance(int slice) {
+	bool pass = true;
+	int rgds = (int) round(groundDouble[slice]);
+	pass = 	(groundInt[slice] == rgds);
+	return pass; }
+
+void TerrestrialGravitation::_sliceConcordanceInt(int slice) {
+	groundDouble[slice] = (double) groundInt[slice];
+	return; }
+
+void TerrestrialGravitation::_sliceConcordance(int slice) {
+	int rdgs = (int) round(groundDouble[slice]);
+	groundInt[slice] = rgds;
+	return; }
+
+bool TerrestrialGravitation::_groundConcordance(void) {
+	bool pass = true;
+	int rgdi = 0;
+	int swd = (int) round(sliceWidthDouble);
+	int gdb = (int) round(gDouble);
+	pass = (pass && (sliceWidthInt == swd));
+	pass = (pass && (gInt == gdb)));
+	if (pass) for (int i = 0; i < groundSlices; i++) {
+		rgdi = (int) round(groundDouble[i]);
+		pass = (pass && (groundInt[i] == rgdi)); }
+	return pass; }
+
+void TerrestrialGravitation::_groundConcordanceInt(void) {
+	sliceWidthDouble = (double) sliceWidthInt;
+	gDouble = (double) gInt;
+	for (i = 0; i < groundSlices; i++)
+		groundDouble[i] = (double) groundInt[i];
+	return; }
+
+void TerrestrialGravitation::_groundConcordanceDouble(void) {
+	int rgdi = 0;
+	int swd = (int) round(sliceWidthDouble);
+	int gdb = (int) round(gDouble);
+	sliceWidthInt = swd;
+	gInt = gdb;
+	for (int i = 0; i < groundSlices; i++) {
+		rgdi = (int) round(groundDouble[i]);
+		groundInt[i] = rgdi; }
+	return; }
 

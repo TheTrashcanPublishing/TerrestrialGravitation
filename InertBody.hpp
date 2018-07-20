@@ -64,6 +64,8 @@ class InertBody
 		InertBody(Cartesian pos, Cartesian vel, Cartesian ipos, int time);
 		InertBody(const InertBody &bodyCopy);
 		operator=(const InertBody &bodyAssignment);
+		bool operator==(const InertBody &bodyEqual1, const InertBody &bodyEqual2);
+		bool operator!=(const InertBody &bodyUnequal1, const InertBody &bodyUnequal2);
 		~InertBody(void);
 		
 		// Read current position

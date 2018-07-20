@@ -50,6 +50,8 @@ class Cartesian
 		operator-(const Cartesian &carte1, const Cartesian &carte2);
 		operator*(const Cartesian &carte1, const Cartesian &carte2); // complex product
 		operator/(const Cartesian &carte1, const Cartesian &carte2); // complex quotient
+		bool operator==(const Cartesian &carteEqual1, const Cartesian &carteEqual2);
+		bool operator!=(const Cartesian &carteUnequal1, const Cartesian &carteUnequal2);
 		~Cartesian();
 		
 		// Read current position
@@ -104,7 +106,23 @@ class Cartesian
 		                               // -1 for positive x-axis	-2 for positive y-axis
 									   // -3 for negative x-axis	-4 for negative y-axis
 									   // 0 for origin
+		int quadrant(int w, int z);         // same as above but coordinates given by (w, z)
 		int quadrant(double ww, double zz); // same as above but coordinates given by (ww, zz)
+		
+		
+		// Convert polar coordinates to rectangular (Cartesian) coordinates
+		int rectangularX(int r, int thetaDeg);
+		double rectagularXX(double rr, double thetaRad);
+		int rectangularY(int r, int thetaDeg);
+		double rectangularYY(double rr, double thetaRad);
+		
+		Cartesian rectangularC(int r, int thetaDeg);        // These functions return an
+		Cartesian rectangularC(double rr, double thetaRad); // external Cartesian object
+		                                                    // with (x, y) coordinates.
+		void rectangular(int r, int thetaDeg);       // These functions set the current
+		void rectangular(double rr, double ThetaRad) // Cartesian object to the (x, y)
+		                                             // coordinates.
+		
 		
 		// Check or force concordance between int coordinates and double coorindates
 		bool concordance(void); // Check concordance, return TRUE if concordant
