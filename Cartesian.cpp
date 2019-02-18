@@ -176,6 +176,22 @@ int Cartesian::invert(int a) { return -a; }
 
 double Cartesian::invert(double aa) { return -aa; }
 
+void Cartesian::transpose(void) {
+	double zz = 0.0;
+	zz = xx;
+	xx = yy;
+	yy = zz;
+	concordanceDouble();
+	return; }
+
+Cartesian Cartesian::transpose(Cartesian carte) {
+	double zz = 0.0;
+	zz = carte.xx;
+	carte.xx = carte.yy;
+	carte.yy = zz;
+	carte.concordanceDouble();
+	return carte; }
+
 double Cartesian::distanceDouble(void) {
 	double dd = sqrt((xx * xx) + (yy * yy));
 	if ((xx < 0) && (yy > 0)) dd = -dd;

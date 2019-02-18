@@ -77,6 +77,10 @@ class Cartesian
 		int invert(int a);
 		double invert(double aa);
 		
+		// Transpose x coordinate and y coordinate
+		void transpose(void);
+		Cartesian transpose(Cartesian carte);
+		
 		// Calculate distance from current position to...
 		int distanceInt(void);            // origin
 		double distanceDouble(void);
